@@ -1,0 +1,30 @@
+parameters:
+  name: '' 
+  vmImage: ''
+  displayName: ''
+  instanceName: ''
+  subscription: ''
+
+jobs:
+- job: ${{ parameters.name }}
+  pool: 
+    vmImage: ${{ parameters.vmImage }}
+  steps:
+  - task: AzureCLI@1
+    displayName: ${{ parameters.displayName }}
+    inputs:
+      azureSubscription: ${{ parameters.subscription }}
+      scriptLocation: 'inlineScript'
+      inlineScript: az group create -n ${{ parameters.instanceName }}-rg -l uksouth
+  - task: AzureCLI@1
+    displayName: 'creating storage account'
+    inputs:
+      azureSubscription: ${{ parameters.subscription }}
+      scriptLocation: 'inlineScript'
+      inlineScript: az storage account create --name ${{ parameters.instanceName }}-sa --location uksouth --resource-group ${{ parameters.instanceName }}-rg --sku Standard_LRS
+ - task: AzureCLI@1
+    displayName: 'creating function app'
+    inputs:
+      azureSubscription: ${{ parameters.subscription }}
+      scriptLocation: 'inlineScript'
+      inlineScript: az functionapp create --resource-group ${{ parameters.instanceName }}-rg --consumption-plan-location uksouth --name ${{ parameters.instanceName }}-fn --storage-account ${{ parameters.instanceName }}-sa --runtime java
