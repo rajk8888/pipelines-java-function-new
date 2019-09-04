@@ -16,8 +16,6 @@ stages:
     pool:
       vmImage: 'ubuntu-latest'
     steps:
-    - script: echo Build
-      displayName: 'About to build'
     - task: SonarQubePrepare@4
       inputs:
         SonarQube: 'sonarqube'
@@ -41,7 +39,7 @@ stages:
        inputs:
          SourceFolder: $(system.defaultworkingdirectory)/target/azure-functions/
          Contents: '**'
-         TargetFolder: $(build.artifactstagingdirectory)   
+         TargetFolder: $(build.artifactstagingdirectory)
      - task: PublishBuildArtifacts@1
        displayName: Publish Artifact
        inputs:
