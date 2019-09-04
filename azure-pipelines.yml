@@ -41,3 +41,13 @@ steps:
   displayName: Publish Artifact
   inputs:
     PathtoPublish: $(build.artifactstagingdirectory)    
+- task: AzureResourceGroupDeployment@2
+  inputs:
+    azureSubscription: 'Free Trial(c8d1e8f4-3147-4ef0-9185-68b60a3427bb)'
+    action: 'Create Or Update Resource Group'
+    resourceGroupName: 'raj1'
+    location: 'UK South'
+    templateLocation: 'Linked artifact'
+    csmFile: 'templates/create-function-arm.json'
+    overrideParameters: '-appName fred2'
+    deploymentMode: 'Incremental'
