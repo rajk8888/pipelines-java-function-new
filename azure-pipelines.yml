@@ -36,14 +36,12 @@ stages:
         effectivePomSkip: false
         sonarQubeRunAnalysis: true
         sqMavenPluginVersionChoice: 'latest'
-
      - task: CopyFiles@2
        displayName: Copy Files
        inputs:
          SourceFolder: $(system.defaultworkingdirectory)/target/azure-functions/
          Contents: '**'
          TargetFolder: $(build.artifactstagingdirectory)   
-
      - task: PublishBuildArtifacts@1
        displayName: Publish Artifact
        inputs:
