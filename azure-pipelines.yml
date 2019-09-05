@@ -104,6 +104,13 @@ stages:
        csmFile: 'templates/create-function-arm.json'
        overrideParameters: '-appName $(appName)-qa'
        deploymentMode: 'Incremental'
+    - task: DownloadPipelineArtifact@2
+      inputs:
+        buildType: 'specific'
+        project: '3b365fab-c3bb-43d3-ab19-9964770c86b9'
+        definition: '9'
+        buildVersionToDownload: 'latest'
+        targetPath: '$(Pipeline.Workspace)'
     - task: AzureFunctionApp@1
       displayName: Azure Function App deploy
       inputs:
@@ -123,4 +130,88 @@ stages:
         method: 'GET'
         queryParameters: 'name=World'
         waitForCompletion: 'false'
-    
+
+- stage: DeployToPreProd
+  jobs:
+  - job: deployPP
+    pool:
+      vmImage: 'ubuntu-latest'
+    steps:
+    - task: AzureResourceGroupDeployment@2
+      inputs:
+       azureSubscription: $(serviceConnectionToAzure)
+       action: 'Create Or Update Resource Group'
+       resourceGroupName: 'raj1-pp'
+       location: 'UK South'
+       templateLocation: 'Linked artifact'
+       csmFile: 'templates/create-function-arm.json'
+       overrideParameters: '-appName $(appName)-pp'
+       deploymentMode: 'Incremental'
+    - task: DownloadPipelineArtifact@2
+      inputs:
+        buildType: 'specific'
+        project: '3b365fab-c3bb-43d3-ab19-9964770c86b9'
+        definition: '9'
+        buildVersionToDownload: 'latest'
+        targetPath: '$(Pipeline.Workspace)'
+    - task: AzureFunctionApp@1
+      displayName: Azure Function App deploy
+      inputs:
+        azureSubscription: '$(serviceConnectionToAzure)'
+        appType: 'functionApp'
+        appName: '$(appName)-pp'
+        package: '$(Pipeline.Workspace)/drop/javafunctions'
+        deploymentMethod: 'auto'
+  - job: serverjob
+    pool: server
+    dependsOn: deployPP
+    steps:
+    - task: AzureFunction@1
+      inputs:
+        function: 'https://$(appName)-pp.azurewebsites.net/api/HttpTrigger-Java'
+        key: 'ZcEh2VajFv3aYFEGJGrCqNjJsgeSC5SJnT0xUC6cf75a0hpCxVT5UQ=='
+        method: 'GET'
+        queryParameters: 'name=World'
+        waitForCompletion: 'false'
+- stage: DeployToProduction
+  jobs:
+  - job: deployPD
+    pool:
+      vmImage: 'ubuntu-latest'
+    steps:
+    - task: AzureResourceGroupDeployment@2
+      inputs:
+       azureSubscription: $(serviceConnectionToAzure)
+       action: 'Create Or Update Resource Group'
+       resourceGroupName: 'raj1-pd'
+       location: 'UK South'
+       templateLocation: 'Linked artifact'
+       csmFile: 'templates/create-function-arm.json'
+       overrideParameters: '-appName $(appName)-pd'
+       deploymentMode: 'Incremental'
+    - task: DownloadPipelineArtifact@2
+      inputs:
+        buildType: 'specific'
+        project: '3b365fab-c3bb-43d3-ab19-9964770c86b9'
+        definition: '9'
+        buildVersionToDownload: 'latest'
+        targetPath: '$(Pipeline.Workspace)'
+    - task: AzureFunctionApp@1
+      displayName: Azure Function App deploy
+      inputs:
+        azureSubscription: '$(serviceConnectionToAzure)'
+        appType: 'functionApp'
+        appName: '$(appName)-pd'
+        package: '$(Pipeline.Workspace)/drop/javafunctions'
+        deploymentMethod: 'auto'
+  - job: serverjob
+    pool: server
+    dependsOn: deployPD
+    steps:
+    - task: AzureFunction@1
+      inputs:
+        function: 'https://$(appName)-pd.azurewebsites.net/api/HttpTrigger-Java'
+        key: 'ZcEh2VajFv3aYFEGJGrCqNjJsgeSC5SJnT0xUC6cf75a0hpCxVT5UQ=='
+        method: 'GET'
+        queryParameters: 'name=World'
+        waitForCompletion: 'false'    
