@@ -121,7 +121,7 @@ stages:
 
   - job: serverjob
     pool: server
-    dependsOn: deployjob
+    dependsOn: deployQA
     steps:
     - task: AzureFunction@1
       inputs:
