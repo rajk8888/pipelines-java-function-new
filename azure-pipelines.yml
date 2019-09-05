@@ -1,7 +1,3 @@
-# Maven
-# Build your Java project and run tests with Apache Maven.
-# Add steps that analyze code, save build artifacts, deploy, and more:
-# https://docs.microsoft.com/azure/devops/pipelines/languages/java
 variables:
   # the name of the service connection that you created above
   serviceConnectionToAzure: rajk1000connection
@@ -12,17 +8,17 @@ variables:
 trigger:
 - master
 
-pool:
+jobs:
+ -job: myjob
+ pool:
   vmImage: 'ubuntu-latest'
-
-steps:
-
-- task: SonarQubePrepare@4
-  inputs:
+ steps:
+ - task: SonarQubePrepare@4
+   inputs:
     SonarQube: 'sonarqube'
     scannerMode: 'Other'
-- task: Maven@3
-  inputs:
+ - task: Maven@3
+   inputs:
     mavenPomFile: 'pom.xml'
     publishJUnitResults: true
     testResultsFiles: '**/surefire-reports/TEST-*.xml'
@@ -36,19 +32,19 @@ steps:
     sonarQubeRunAnalysis: true
     sqMavenPluginVersionChoice: 'latest'
 
-- task: CopyFiles@2
-  displayName: Copy Files
-  inputs:
+ - task: CopyFiles@2
+   displayName: Copy Files
+   inputs:
     SourceFolder: $(system.defaultworkingdirectory)/target/azure-functions/
     Contents: '**'
     TargetFolder: $(build.artifactstagingdirectory)   
 
-- task: PublishBuildArtifacts@1
-  displayName: Publish Artifact
-  inputs:
+ - task: PublishBuildArtifacts@1
+   displayName: Publish Artifact
+   inputs:
     PathtoPublish: $(build.artifactstagingdirectory)    
-- task: AzureResourceGroupDeployment@2
-  inputs:
+ - task: AzureResourceGroupDeployment@2
+   inputs:
     azureSubscription: $(serviceConnectionToAzure)
     action: 'Create Or Update Resource Group'
     resourceGroupName: 'raj1'
@@ -57,15 +53,16 @@ steps:
     csmFile: 'templates/create-function-arm.json'
     overrideParameters: '-appName $(appName)-ci'
     deploymentMode: 'Incremental'
-- task: AzureFunctionApp@1
-  displayName: Azure Function App deploy
-  inputs:
+ - task: AzureFunctionApp@1
+   displayName: Azure Function App deploy
+   inputs:
     azureSubscription: $(serviceConnectionToAzure)
     appType: functionApp
     appName: $(appName)-ci
     package: $(build.artifactstagingdirectory)/javafunctions
-- task: AzureFunction@1
-  inputs:
+
+ - task: AzureFunction@1
+   inputs:
     function: 'https://$(appName)-ci.azurewebsites.net/api/HttpTrigger-Java'
     key: 'ZcEh2VajFv3aYFEGJGrCqNjJsgeSC5SJnT0xUC6cf75a0hpCxVT5UQ=='
     method: 'GET'
