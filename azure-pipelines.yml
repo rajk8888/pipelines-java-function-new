@@ -2,6 +2,12 @@
 # Build your Java project and run tests with Apache Maven.
 # Add steps that analyze code, save build artifacts, deploy, and more:
 # https://docs.microsoft.com/azure/devops/pipelines/languages/java
+variables:
+  # the name of the service connection that you created above
+  serviceConnectionToAzure: rajk1000connection
+  # the name of your web app here is the same one you used above
+  # when you created the web app using the Azure CLI
+  appName: rajk-funct
 
 trigger:
 - master
@@ -43,11 +49,18 @@ steps:
     PathtoPublish: $(build.artifactstagingdirectory)    
 - task: AzureResourceGroupDeployment@2
   inputs:
-    azureSubscription: 'Free Trial(c8d1e8f4-3147-4ef0-9185-68b60a3427bb)'
+    azureSubscription: $(serviceConnectionToAzure)
     action: 'Create Or Update Resource Group'
     resourceGroupName: 'raj1'
     location: 'UK South'
     templateLocation: 'Linked artifact'
     csmFile: 'templates/create-function-arm.json'
-    overrideParameters: '-appName fred2'
+    overrideParameters: '-appName $(appName)-ci'
     deploymentMode: 'Incremental'
+- task: AzureFunctionApp@1
+  displayName: Azure Function App deploy
+  inputs:
+    azureSubscription: $(serviceConnectionToAzure)
+    appType: functionApp
+    appName: $(appName)-ci
+    package: $(build.artifactstagingdirectory)/javafunctions
