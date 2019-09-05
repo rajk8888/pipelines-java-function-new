@@ -57,21 +57,21 @@ stages:
   - job: deployJob
     steps:
     - task: AzureFunctionApp@1
-    displayName: Azure Function App deploy
-    inputs:
-     azureSubscription: $(serviceConnectionToAzure)
-     appType: functionApp
-     appName: $(appName)-ci
-     package: $(build.artifactstagingdirectory)/javafunctions
+      displayName: Azure Function App deploy
+      inputs:
+       azureSubscription: $(serviceConnectionToAzure)
+       appType: functionApp
+       appName: $(appName)-ci
+       package: $(build.artifactstagingdirectory)/javafunctions
 
   - job: serverjob
     pool: server
     dependsOn: myjob
     steps:
     - task: AzureFunction@1
-    inputs:
-      function: 'https://$(appName)-ci.azurewebsites.net/api/HttpTrigger-Java'
-      key: 'ZcEh2VajFv3aYFEGJGrCqNjJsgeSC5SJnT0xUC6cf75a0hpCxVT5UQ=='
-      method: 'GET'
-      queryParameters: 'name=World'
-      waitForCompletion: 'false'
+      inputs:
+        function: 'https://$(appName)-ci.azurewebsites.net/api/HttpTrigger-Java'
+        key: 'ZcEh2VajFv3aYFEGJGrCqNjJsgeSC5SJnT0xUC6cf75a0hpCxVT5UQ=='
+        method: 'GET'
+        queryParameters: 'name=World'
+        waitForCompletion: 'false'
