@@ -13,48 +13,48 @@ jobs:
   steps:
   - task: SonarQubePrepare@4
     inputs:
-    SonarQube: 'sonarqube'
-    scannerMode: 'Other'
+     SonarQube: 'sonarqube'
+     scannerMode: 'Other'
   - task: Maven@3
     inputs:
-    mavenPomFile: 'pom.xml'
-    publishJUnitResults: true
-    testResultsFiles: '**/surefire-reports/TEST-*.xml'
-    codeCoverageToolOption: 'JaCoCo'
-    javaHomeOption: 'JDKVersion'
-    jdkVersionOption: '1.8'
-    mavenVersionOption: 'Default'
-    mavenOptions: '-Xmx3072m'
-    mavenAuthenticateFeed: false
-    effectivePomSkip: false
-    sonarQubeRunAnalysis: true
-    sqMavenPluginVersionChoice: 'latest'
+     mavenPomFile: 'pom.xml'
+     publishJUnitResults: true
+     testResultsFiles: '**/surefire-reports/TEST-*.xml'
+     codeCoverageToolOption: 'JaCoCo'
+     javaHomeOption: 'JDKVersion'
+     jdkVersionOption: '1.8'
+     mavenVersionOption: 'Default'
+     mavenOptions: '-Xmx3072m'
+     mavenAuthenticateFeed: false
+     effectivePomSkip: false
+     sonarQubeRunAnalysis: true
+     sqMavenPluginVersionChoice: 'latest'
 
   - task: CopyFiles@2
     displayName: Copy Files
     inputs:
-    SourceFolder: $(system.defaultworkingdirectory)/target/azure-functions/
-    Contents: '**'
-    TargetFolder: $(build.artifactstagingdirectory)   
+     SourceFolder: $(system.defaultworkingdirectory)/target/azure-functions/
+     Contents: '**'
+     TargetFolder: $(build.artifactstagingdirectory)   
 
   - task: PublishBuildArtifacts@1
     displayName: Publish Artifact
     inputs:
-    PathtoPublish: $(build.artifactstagingdirectory)    
+     PathtoPublish: $(build.artifactstagingdirectory)    
   - task: AzureResourceGroupDeployment@2
     inputs:
-    azureSubscription: $(serviceConnectionToAzure)
-    action: 'Create Or Update Resource Group'
-    resourceGroupName: 'raj1'
-    location: 'UK South'
-    templateLocation: 'Linked artifact'
-    csmFile: 'templates/create-function-arm.json'
-    overrideParameters: '-appName $(appName)-ci'
-    deploymentMode: 'Incremental'
+     azureSubscription: $(serviceConnectionToAzure)
+     action: 'Create Or Update Resource Group'
+     resourceGroupName: 'raj1'
+     location: 'UK South'
+     templateLocation: 'Linked artifact'
+     csmFile: 'templates/create-function-arm.json'
+     overrideParameters: '-appName $(appName)-ci'
+     deploymentMode: 'Incremental'
   - task: AzureFunctionApp@1
     displayName: Azure Function App deploy
     inputs:
-    azureSubscription: $(serviceConnectionToAzure)
-    appType: functionApp
-    appName: $(appName)-ci
-    package: $(build.artifactstagingdirectory)/javafunctions
+     azureSubscription: $(serviceConnectionToAzure)
+     appType: functionApp
+     appName: $(appName)-ci
+     package: $(build.artifactstagingdirectory)/javafunctions
