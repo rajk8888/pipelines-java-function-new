@@ -1,6 +1,7 @@
 variables:
    serviceConnectionToAzure: Free Trial(c8d1e8f4-3147-4ef0-9185-68b60a3427bb)
    appName: rajk-funct
+   buildNum: $(Build.BuildId)
 
 trigger:
 - master
@@ -57,7 +58,7 @@ stages:
         location: 'UK South'
         templateLocation: 'Linked artifact'
         csmFile: 'templates/create-function-arm.json'
-        overrideParameters: '-appName $(appName)-ci2'
+        overrideParameters: '-appName $(appName)-$(buildNum)-ci'
         deploymentMode: 'Incremental'
     - task: DownloadPipelineArtifact@2
       inputs:
@@ -71,7 +72,7 @@ stages:
       inputs:
         azureSubscription: '$(serviceConnectionToAzure)'
         appType: 'functionApp'
-        appName: '$(appName)-ci2'
+        appName: '$(appName)-$(buildNum)-ci'
         package: '$(Pipeline.Workspace)/drop/javafunctions'
         deploymentMethod: 'auto'
 
@@ -81,7 +82,7 @@ stages:
     steps:
     - task: AzureFunction@1
       inputs:
-        function: 'https://$(appName)-ci2.azurewebsites.net/api/HttpTrigger-Java'
+        function: 'https://$(appName)-$(buildNum)-ci.azurewebsites.net/api/HttpTrigger-Java'
         key: 'ZcEh2VajFv3aYFEGJGrCqNjJsgeSC5SJnT0xUC6cf75a0hpCxVT5UQ=='
         method: 'GET'
         queryParameters: 'name=World'
@@ -101,7 +102,7 @@ stages:
        location: 'UK South'
        templateLocation: 'Linked artifact'
        csmFile: 'templates/create-function-arm.json'
-       overrideParameters: '-appName $(appName)-qa'
+       overrideParameters: '-appName $(appName)-$(buildNum)-qa'
        deploymentMode: 'Incremental'
     - task: DownloadPipelineArtifact@2
       inputs:
@@ -115,7 +116,7 @@ stages:
       inputs:
         azureSubscription: '$(serviceConnectionToAzure)'
         appType: 'functionApp'
-        appName: '$(appName)-qa'
+        appName: '$(appName)-$(buildNum)-qa'
         package: '$(Pipeline.Workspace)/drop/javafunctions'
         deploymentMethod: 'auto'
 
@@ -125,12 +126,9 @@ stages:
     steps:
     - task: AzureFunction@1
       inputs:
-        function: 'https://$(appName)-qa.azurewebsites.net/api/HttpTrigger-Java'
+        function: 'https://$(appName)-$(buildNum)-qa.azurewebsites.net/api/HttpTrigger-Java'
         key: 'ZcEh2VajFv3aYFEGJGrCqNjJsgeSC5SJnT0xUC6cf75a0hpCxVT5UQ=='
         method: 'GET'
         queryParameters: 'name=World'
         waitForCompletion: 'false'
-    - task: ManualIntervention@8
-      inputs:
-        instructions: 'manual placeholder for testing'
-        emailRecipients: 'rajk_1000@hotmail.com'
+    
