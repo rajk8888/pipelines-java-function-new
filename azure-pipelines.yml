@@ -6,57 +6,57 @@ trigger:
 - master
 stages:
 - stage: BuildStage
-jobs:
-- job: myjob
-  pool:
-   vmImage: 'ubuntu-latest'
-  steps:
-  - task: SonarQubePrepare@4
-    inputs:
-     SonarQube: 'sonarqube'
-     scannerMode: 'Other'
-  - task: Maven@3
-    inputs:
-     mavenPomFile: 'pom.xml'
-     publishJUnitResults: true
-     testResultsFiles: '**/surefire-reports/TEST-*.xml'
-     codeCoverageToolOption: 'JaCoCo'
-     javaHomeOption: 'JDKVersion'
-     jdkVersionOption: '1.8'
-     mavenVersionOption: 'Default'
-     mavenOptions: '-Xmx3072m'
-     mavenAuthenticateFeed: false
-     effectivePomSkip: false
-     sonarQubeRunAnalysis: true
-     sqMavenPluginVersionChoice: 'latest'
+  jobs:
+  - job: myjob
+    pool:
+      vmImage: 'ubuntu-latest'
+    steps:
+    - task: SonarQubePrepare@4
+      inputs:
+       SonarQube: 'sonarqube'
+       scannerMode: 'Other'
+    - task: Maven@3
+      inputs:
+       mavenPomFile: 'pom.xml'
+       publishJUnitResults: true
+       testResultsFiles: '**/surefire-reports/TEST-*.xml'
+       codeCoverageToolOption: 'JaCoCo'
+       javaHomeOption: 'JDKVersion'
+       jdkVersionOption: '1.8'
+       mavenVersionOption: 'Default'
+       mavenOptions: '-Xmx3072m'
+       mavenAuthenticateFeed: false
+       effectivePomSkip: false
+       sonarQubeRunAnalysis: true
+       sqMavenPluginVersionChoice: 'latest'
 
-  - task: CopyFiles@2
-    displayName: Copy Files
-    inputs:
-     SourceFolder: $(system.defaultworkingdirectory)/target/azure-functions/
-     Contents: '**'
-     TargetFolder: $(build.artifactstagingdirectory)   
+    - task: CopyFiles@2
+      displayName: Copy Files
+      inputs:
+       SourceFolder: $(system.defaultworkingdirectory)/target/azure-functions/
+       Contents: '**'
+       TargetFolder: $(build.artifactstagingdirectory)   
 
-  - task: PublishBuildArtifacts@1
-    displayName: Publish Artifact
-    inputs:
-     PathtoPublish: $(build.artifactstagingdirectory)    
-  - task: AzureResourceGroupDeployment@2
-    inputs:
-     azureSubscription: $(serviceConnectionToAzure)
-     action: 'Create Or Update Resource Group'
-     resourceGroupName: 'raj1'
-     location: 'UK South'
-     templateLocation: 'Linked artifact'
-     csmFile: 'templates/create-function-arm.json'
-     overrideParameters: '-appName $(appName)-ci'
-     deploymentMode: 'Incremental'
+    - task: PublishBuildArtifacts@1
+      displayName: Publish Artifact
+      inputs:
+       PathtoPublish: $(build.artifactstagingdirectory)    
+    - task: AzureResourceGroupDeployment@2
+      inputs:
+       azureSubscription: $(serviceConnectionToAzure)
+       action: 'Create Or Update Resource Group'
+       resourceGroupName: 'raj1'
+       location: 'UK South'
+       templateLocation: 'Linked artifact'
+       csmFile: 'templates/create-function-arm.json'
+       overrideParameters: '-appName $(appName)-ci'
+       deploymentMode: 'Incremental'
 
 - stage: DeployToCI
-jobs:
-- job: deployJob
-  steps:
-  - task: AzureFunctionApp@1
+  jobs:
+  - job: deployJob
+    steps:
+    - task: AzureFunctionApp@1
     displayName: Azure Function App deploy
     inputs:
      azureSubscription: $(serviceConnectionToAzure)
@@ -64,11 +64,11 @@ jobs:
      appName: $(appName)-ci
      package: $(build.artifactstagingdirectory)/javafunctions
 
-- job: serverjob
-  pool: server
-  dependsOn: myjob
-  steps:
-  - task: AzureFunction@1
+  - job: serverjob
+    pool: server
+    dependsOn: myjob
+    steps:
+    - task: AzureFunction@1
     inputs:
       function: 'https://$(appName)-ci.azurewebsites.net/api/HttpTrigger-Java'
       key: 'ZcEh2VajFv3aYFEGJGrCqNjJsgeSC5SJnT0xUC6cf75a0hpCxVT5UQ=='
