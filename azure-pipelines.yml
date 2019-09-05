@@ -58,13 +58,21 @@ stages:
     pool:
       vmImage: 'ubuntu-latest'
     steps:
+    - task: DownloadPipelineArtifact@2
+      inputs:
+        buildType: 'specific'
+        project: '3b365fab-c3bb-43d3-ab19-9964770c86b9'
+        definition: '9'
+        buildVersionToDownload: 'latest'
+        targetPath: '$(Pipeline.Workspace)'
     - task: AzureFunctionApp@1
       displayName: Azure Function App deploy
       inputs:
-       azureSubscription: $(serviceConnectionToAzure)
-       appType: functionApp
-       appName: $(appName)-ci
-       package: $(build.artifactstagingdirectory)/javafunctions
+        azureSubscription: '$(serviceConnectionToAzure)'
+        appType: 'functionApp'
+        appName: '$(appName)-ci'
+        package: '$(Pipeline.Workspace)/javafunctions'
+        deploymentMethod: 'auto'
 
   - job: serverjob
     pool: server
