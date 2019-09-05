@@ -2,22 +2,21 @@ trigger:
 - master
 
 jobs:
--job: myjob
- pool:
-  vmImage: 'ubuntu-latest'
- variables:
-  # the name of the service connection that you created above
-  serviceConnectionToAzure: rajk1000connection
-  # the name of your web app here is the same one you used above
-  # when you created the web app using the Azure CLI
-  appName: rajk-funct
- steps:
- - task: SonarQubePrepare@4
-   inputs:
+- job: myjob
+  pool:
+   vmImage: 'ubuntu-latest'
+  variables:
+  - name: serviceConnectionToAzure
+    value: rajk1000connection
+  - name: appName
+    value: rajk-funct
+  steps:
+  - task: SonarQubePrepare@4
+    inputs:
     SonarQube: 'sonarqube'
     scannerMode: 'Other'
- - task: Maven@3
-   inputs:
+  - task: Maven@3
+    inputs:
     mavenPomFile: 'pom.xml'
     publishJUnitResults: true
     testResultsFiles: '**/surefire-reports/TEST-*.xml'
@@ -31,19 +30,19 @@ jobs:
     sonarQubeRunAnalysis: true
     sqMavenPluginVersionChoice: 'latest'
 
- - task: CopyFiles@2
-   displayName: Copy Files
-   inputs:
+  - task: CopyFiles@2
+    displayName: Copy Files
+    inputs:
     SourceFolder: $(system.defaultworkingdirectory)/target/azure-functions/
     Contents: '**'
     TargetFolder: $(build.artifactstagingdirectory)   
 
- - task: PublishBuildArtifacts@1
-   displayName: Publish Artifact
-   inputs:
+  - task: PublishBuildArtifacts@1
+    displayName: Publish Artifact
+    inputs:
     PathtoPublish: $(build.artifactstagingdirectory)    
- - task: AzureResourceGroupDeployment@2
-   inputs:
+  - task: AzureResourceGroupDeployment@2
+    inputs:
     azureSubscription: $(serviceConnectionToAzure)
     action: 'Create Or Update Resource Group'
     resourceGroupName: 'raj1'
@@ -52,9 +51,9 @@ jobs:
     csmFile: 'templates/create-function-arm.json'
     overrideParameters: '-appName $(appName)-ci'
     deploymentMode: 'Incremental'
- - task: AzureFunctionApp@1
-   displayName: Azure Function App deploy
-   inputs:
+  - task: AzureFunctionApp@1
+    displayName: Azure Function App deploy
+    inputs:
     azureSubscription: $(serviceConnectionToAzure)
     appType: functionApp
     appName: $(appName)-ci
