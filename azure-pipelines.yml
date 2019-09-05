@@ -1,17 +1,16 @@
-variables:
+trigger:
+- master
+
+jobs:
+-job: myjob
+ pool:
+  vmImage: 'ubuntu-latest'
+ variables:
   # the name of the service connection that you created above
   serviceConnectionToAzure: rajk1000connection
   # the name of your web app here is the same one you used above
   # when you created the web app using the Azure CLI
   appName: rajk-funct
-
-trigger:
-- master
-
-jobs:
- -job: myjob
- pool:
-  vmImage: 'ubuntu-latest'
  steps:
  - task: SonarQubePrepare@4
    inputs:
