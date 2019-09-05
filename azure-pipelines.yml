@@ -97,9 +97,10 @@ stages:
        csmFile: 'templates/create-function-arm.json'
        overrideParameters: '-appName $(appName)-qa'
        deploymentMode: 'Incremental'
+    
     - task: DownloadPipelineArtifact@2
       inputs:
-        artifact: 'drop'
+        buildType: 'current'
         targetPath: '$(Pipeline.Workspace)'
     - task: AzureFunctionApp@1
       displayName: Azure Function App deploy
@@ -139,10 +140,7 @@ stages:
        deploymentMode: 'Incremental'
     - task: DownloadPipelineArtifact@2
       inputs:
-        buildType: 'specific'
-        project: '3b365fab-c3bb-43d3-ab19-9964770c86b9'
-        definition: '9'
-        buildVersionToDownload: 'latest'
+        buildType: 'current'
         targetPath: '$(Pipeline.Workspace)'
     - task: AzureFunctionApp@1
       displayName: Azure Function App deploy
@@ -169,6 +167,10 @@ stages:
     pool:
       vmImage: 'ubuntu-latest'
     steps:
+    - task: DownloadPipelineArtifact@2
+      inputs:
+        buildType: 'current'
+        targetPath: '$(Pipeline.Workspace)'
     - task: AzureResourceGroupDeployment@2
       inputs:
        azureSubscription: $(serviceConnectionToAzure)
@@ -179,13 +181,6 @@ stages:
        csmFile: 'templates/create-function-arm.json'
        overrideParameters: '-appName $(appName)-pd'
        deploymentMode: 'Incremental'
-    - task: DownloadPipelineArtifact@2
-      inputs:
-        buildType: 'specific'
-        project: '3b365fab-c3bb-43d3-ab19-9964770c86b9'
-        definition: '9'
-        buildVersionToDownload: 'latest'
-        targetPath: '$(Pipeline.Workspace)'
     - task: AzureFunctionApp@1
       displayName: Azure Function App deploy
       inputs:
