@@ -4,7 +4,8 @@ variables:
 
 trigger:
 - master
-
+stages:
+- stage: BuildStage
 jobs:
 - job: myjob
   pool:
@@ -50,6 +51,11 @@ jobs:
      csmFile: 'templates/create-function-arm.json'
      overrideParameters: '-appName $(appName)-ci'
      deploymentMode: 'Incremental'
+
+- stage: DeployToCI
+jobs:
+- job: deployJob
+  steps:
   - task: AzureFunctionApp@1
     displayName: Azure Function App deploy
     inputs:
@@ -57,6 +63,7 @@ jobs:
      appType: functionApp
      appName: $(appName)-ci
      package: $(build.artifactstagingdirectory)/javafunctions
+
 - job: serverjob
   pool: server
   dependsOn: myjob
