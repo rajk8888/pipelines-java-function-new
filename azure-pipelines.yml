@@ -1,5 +1,5 @@
 variables:
-   serviceConnectionToAzure: rajk1000connection
+   serviceConnectionToAzure: Free Trial(c8d1e8f4-3147-4ef0-9185-68b60a3427bb)
    appName: rajk-funct
 
 trigger:
@@ -51,14 +51,14 @@ stages:
     steps:
     - task: AzureResourceGroupDeployment@2
       inputs:
-       azureSubscription: $(serviceConnectionToAzure)
-       action: 'Create Or Update Resource Group'
-       resourceGroupName: 'raj1'
-       location: 'UK South'
-       templateLocation: 'Linked artifact'
-       csmFile: 'templates/create-function-arm.json'
-       overrideParameters: '-appName $(appName)-ci'
-       deploymentMode: 'Incremental'
+        azureSubscription: '$(serviceConnectionToAzure)'
+        action: 'Create Or Update Resource Group'
+        resourceGroupName: 'raj1-ci'
+        location: 'UK South'
+        templateLocation: 'Linked artifact'
+        csmFile: 'templates/create-function-arm.json'
+        overrideParameters: '-appName $(appName)-ci'
+        deploymentMode: 'Incremental'
     - task: DownloadPipelineArtifact@2
       inputs:
         buildType: 'specific'
