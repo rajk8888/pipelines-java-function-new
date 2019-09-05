@@ -1,3 +1,7 @@
+variables:
+   serviceConnectionToAzure: rajk1000connection
+   appName: rajk-funct
+
 trigger:
 - master
 
@@ -5,9 +9,6 @@ jobs:
 - job: myjob
   pool:
    vmImage: 'ubuntu-latest'
-  variables:
-   serviceConnectionToAzure: rajk1000connection
-   appName: rajk-funct
   steps:
   - task: SonarQubePrepare@4
     inputs:
