@@ -55,6 +55,8 @@ stages:
 - stage: DeployToCI
   jobs:
   - job: deployJob
+    pool:
+      vmImage: 'ubuntu-latest'
     steps:
     - task: AzureFunctionApp@1
       displayName: Azure Function App deploy
