@@ -59,7 +59,6 @@ stages:
     - task: DownloadPipelineArtifact@2
       inputs:
         buildType: 'current'
-        artifactName: 'drop'
         targetPath: '$(Pipeline.Workspace)'
     - task: AzureFunctionApp@1
       displayName: Azure Function App deploy
@@ -67,7 +66,7 @@ stages:
         azureSubscription: '$(serviceConnectionToAzure)'
         appType: 'functionApp'
         appName: '$(appName)-ci'
-        package: '$(Pipeline.Workspace)/drop/javafunctions'
+        package: '$(Pipeline.Workspace)/javafunctions'
         deploymentMethod: 'auto'
 
   - job: serverjob
