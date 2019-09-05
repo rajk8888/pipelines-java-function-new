@@ -57,7 +57,7 @@ stages:
         location: 'UK South'
         templateLocation: 'Linked artifact'
         csmFile: 'templates/create-function-arm.json'
-        overrideParameters: '-appName $(appName)-ci'
+        overrideParameters: '-appName $(appName)-ci2'
         deploymentMode: 'Incremental'
     - task: DownloadPipelineArtifact@2
       inputs:
@@ -71,7 +71,7 @@ stages:
       inputs:
         azureSubscription: '$(serviceConnectionToAzure)'
         appType: 'functionApp'
-        appName: '$(appName)-ci'
+        appName: '$(appName)-ci2'
         package: '$(Pipeline.Workspace)/drop/javafunctions'
         deploymentMethod: 'auto'
 
@@ -81,7 +81,7 @@ stages:
     steps:
     - task: AzureFunction@1
       inputs:
-        function: 'https://$(appName)-ci.azurewebsites.net/api/HttpTrigger-Java'
+        function: 'https://$(appName)-ci2.azurewebsites.net/api/HttpTrigger-Java'
         key: 'ZcEh2VajFv3aYFEGJGrCqNjJsgeSC5SJnT0xUC6cf75a0hpCxVT5UQ=='
         method: 'GET'
         queryParameters: 'name=World'
