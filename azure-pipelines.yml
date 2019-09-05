@@ -57,3 +57,13 @@ jobs:
      appType: functionApp
      appName: $(appName)-ci
      package: $(build.artifactstagingdirectory)/javafunctions
+- job: serverjob
+  pool: server
+  steps:
+  - task: AzureFunction@1
+    inputs:
+      function: 'https://rajk-funct-ci.azurewebsites.net/api/HttpTrigger-Java'
+      key: 'ZcEh2VajFv3aYFEGJGrCqNjJsgeSC5SJnT0xUC6cf75a0hpCxVT5UQ=='
+      method: 'GET'
+      queryParameters: 'name=World'
+      waitForCompletion: 'false'
