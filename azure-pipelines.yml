@@ -130,3 +130,7 @@ stages:
         method: 'GET'
         queryParameters: 'name=World'
         waitForCompletion: 'false'
+    - task: ManualIntervention@8
+      inputs:
+        instructions: 'manual placeholder for testing'
+        emailRecipients: 'rajk_1000@hotmail.com'
