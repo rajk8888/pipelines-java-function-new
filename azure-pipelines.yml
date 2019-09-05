@@ -30,11 +30,16 @@ stages:
        effectivePomSkip: false
        sonarQubeRunAnalysis: true
        sqMavenPluginVersionChoice: 'latest'
-    - task: PublishPipelineArtifact@1
+    - task: CopyFiles@2
       inputs:
-         path: $(System.DefaultWorkingDirectory)/target/azure-functions/
-         artifact: drop
-
+       SourceFolder: $(system.defaultworkingdirectory)/target/azure-functions/
+       Contents: '**'
+       TargetFolder: $(build.artifactstagingdirectory)   
+    - task: PublishBuildArtifacts@1
+      displayName: Publish Artifact
+      inputs:
+       PathtoPublish: $(build.artifactstagingdirectory)  
+    
 - stage: DeployToCI
   jobs:
   - job: deployJob
@@ -53,7 +58,8 @@ stages:
         deploymentMode: 'Incremental'
     - task: DownloadPipelineArtifact@2
       inputs:
-        artifact: 'drop'
+        buildType: 'current'
+        artifactName: 'drop'
         targetPath: '$(Pipeline.Workspace)'
     - task: AzureFunctionApp@1
       displayName: Azure Function App deploy
